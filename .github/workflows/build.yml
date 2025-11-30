@@ -409,7 +409,7 @@ jobs:
             sed -i 's/check_defconfig//' ./common/build.config.gki
           fi
 
-      - name: Configure KernelSU Core
+      - name: Configure KernelSU Core & Steam Support
         working-directory: ${{ env.KERNEL_ROOT }}
         run: |
           # KernelSU Configuration
@@ -420,6 +420,11 @@ jobs:
           # Steam & Docker Support (Custom)
           echo "CONFIG_SYSVIPC=y" >> "${{ env.DEFCONFIG }}"
           echo "CONFIG_USER_NS=y" >> "${{ env.DEFCONFIG }}"
+          echo "CONFIG_PID_NS=y" >> "${{ env.DEFCONFIG }}"
+          
+          # Anti-Bootloop Settings (Disable Paranoid Network)
+          echo "CONFIG_ANDROID_PARANOID_NETWORK=n" >> "${{ env.DEFCONFIG }}"
+          echo "CONFIG_UID_SYS_STATS=n" >> "${{ env.DEFCONFIG }}"
 
           sed -i -e 's/goto show_pad;/return 0;/' common/fs/proc/task_mmu.c || true
 
