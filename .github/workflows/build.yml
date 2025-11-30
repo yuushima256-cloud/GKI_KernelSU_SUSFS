@@ -421,6 +421,8 @@ jobs:
           echo "CONFIG_SYSVIPC=y" >> "${{ env.DEFCONFIG }}"
           echo "CONFIG_USER_NS=y" >> "${{ env.DEFCONFIG }}"
 
+          sed -i -e 's/goto show_pad;/return 0;/' common/fs/proc/task_mmu.c || true
+
           
       - name: Configure Mountify Support
         working-directory: ${{ env.KERNEL_ROOT }}
