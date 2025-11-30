@@ -420,7 +420,6 @@ jobs:
           # Steam & Docker Support (Custom)
           echo "CONFIG_SYSVIPC=y" >> "${{ env.DEFCONFIG }}"
           echo "CONFIG_USER_NS=y" >> "${{ env.DEFCONFIG }}"
-          echo "CONFIG_DOCKER=y" >> "${{ env.DEFCONFIG }}"
 
           
       - name: Configure Mountify Support
