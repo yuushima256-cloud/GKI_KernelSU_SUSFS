@@ -428,6 +428,28 @@ jobs:
 
           sed -i -e 's/goto show_pad;/return 0;/' common/fs/proc/task_mmu.c || true
 
+      - name: Apply Anti-Bootloop Patches (UserNS Fix)
+        working-directory: ${{ env.KERNEL_ROOT }}/common
+        run: |
+          echo "Applying patches to bypass Android Paranoid Network..."
+          
+          # 1. Hard-disable Paranoid Network in sock.c
+          # CONFIGでnにしてもコードに残る場合があるため、マクロ自体を0に置換
+          if [ -f "net/core/sock.c" ]; then
+            sed -i 's/defined(CONFIG_ANDROID_PARANOID_NETWORK)/0/' net/core/sock.c
+          fi
+          
+          # 2. Relax user_namespace creation checks
+          # ns_capableチェックを無効化して、Zygoteなどが死ぬのを防ぐ
+          if [ -f "kernel/user_namespace.c" ]; then
+            sed -i 's/if (!ns_capable(current_user_ns(), CAP_SYS_ADMIN))/if (0)/' kernel/user_namespace.c
+          fi
+          
+          # 3. Relax MNT_DETACH checks (Helpful for proot/containers)
+          if [ -f "fs/namespace.c" ]; then
+            sed -i 's/if (!ns_capable(mnt_ns->user_ns, CAP_SYS_ADMIN))/if (0)/' fs/namespace.c
+          fi
+
           
       - name: Configure Mountify Support
         working-directory: ${{ env.KERNEL_ROOT }}
